@@ -12,8 +12,8 @@ def randMel():
     NUM_NOTES = 100
     
     #notes = [i for i in np.linspace(FREQ_MIN, FREQ_MAX, NUM_NOTES - 1)] 
-    notes = [random.randint(FREQ_MIN, FREQ_MAX) for i in range(NUM_NOTES)]
-    random.randint(FREQ_MIN, FREQ_MAX)
+    #notes = [random.randint(FREQ_MIN, FREQ_MAX) for i in range(NUM_NOTES)]
+    #random.randint(FREQ_MIN, FREQ_MAX)
     
     twelveTone = readCSV()
     twelveTone = twelveTone[30:54]
