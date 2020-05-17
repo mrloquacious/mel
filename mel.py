@@ -24,19 +24,12 @@ notes = [random.randint(FREQ_MIN, FREQ_MAX) for i in range(NUM_NOTES)]
 #random.randint(FREQ_MIN, FREQ_MAX)
 
 # Create a dataframe from csv
-twelveTone = pd.read_csv('freq_12tone.csv', delimiter=',')
+df = pd.read_csv('freq_12tone.csv', delimiter=',')
 # User list comprehension to create a list of lists from Dataframe rows
-freq = [list(row) for row in twelveTone.values]
+twelveTone = [list(row) for row in df.values]
 
-
-freq = freq[30:54]
-notes = [random.choice(freq) for i in range(NUM_NOTES)]
-
-
-# Print list of lists i.e. rows
-#print(freq)
-
-#return freq
+twelveTone = twelveTone[30:54]
+notes = [random.choice(twelveTone) for i in range(NUM_NOTES)]
 
 def calcFreq():
     return 440 * 2**((key - 69) / 12)
