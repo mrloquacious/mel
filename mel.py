@@ -12,23 +12,12 @@ import sys
 
 SAMPLE_RATE = 24000
 
-def randMel():
+SECONDS = 1
+FREQ_MIN = 100
+FREQ_MAX = 1000
+NUM_NOTES = 100
 
-    SECONDS = 1
-    FREQ_MIN = 100
-    FREQ_MAX = 1000
-    NUM_NOTES = 100
-    
-    #notes = [i for i in np.linspace(FREQ_MIN, FREQ_MAX, NUM_NOTES - 1)] 
-    notes = [random.randint(FREQ_MIN, FREQ_MAX) for i in range(NUM_NOTES)]
-    random.randint(FREQ_MIN, FREQ_MAX)
-    
-    twelveTone = readCSV()
-    twelveTone = twelveTone[30:54]
-    notes = [random.choice(twelveTone) for i in range(NUM_NOTES)]
-    
-    #calcSine(notes, SECONDS)
-    return calcSine(notes, SECONDS)
+currentNotes = set()
 
 def readCSV():
 
@@ -42,6 +31,17 @@ def readCSV():
     #print(freq)
 
     return freq
+
+def calcFreq():
+    return 440 * 2**((key - 69) / 12)
+
+#notes = [i for i in np.linspace(FREQ_MIN, FREQ_MAX, NUM_NOTES - 1)] 
+notes = [random.randint(FREQ_MIN, FREQ_MAX) for i in range(NUM_NOTES)]
+random.randint(FREQ_MIN, FREQ_MAX)
+
+twelveTone = readCSV()
+twelveTone = twelveTone[30:54]
+notes = [random.choice(twelveTone) for i in range(NUM_NOTES)]
 
 
 def calcSine(notes, SECONDS):
@@ -66,7 +66,7 @@ def playSine(audio):
 
 def callback(in_data, frame_count, time_info, status):
     #data = wf.readframes(frame_count)
-    data = randMel()
+    data = calcSine()
 
     return (data, pyaudio.paContinue)
 
