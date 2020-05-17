@@ -19,30 +19,27 @@ NUM_NOTES = 100
 
 currentNotes = set()
 
-def readCSV():
+#notes = [i for i in np.linspace(FREQ_MIN, FREQ_MAX, NUM_NOTES - 1)] 
+notes = [random.randint(FREQ_MIN, FREQ_MAX) for i in range(NUM_NOTES)]
+#random.randint(FREQ_MIN, FREQ_MAX)
 
-    # Create a dataframe from csv
-    df = pd.read_csv('freq_12tone.csv', delimiter=',')
+# Create a dataframe from csv
+twelveTone = pd.read_csv('freq_12tone.csv', delimiter=',')
+# User list comprehension to create a list of lists from Dataframe rows
+freq = [list(row) for row in twelveTone.values]
 
-    # User list comprehension to create a list of lists from Dataframe rows
-    freq = [list(row) for row in df.values]
 
-    # Print list of lists i.e. rows
-    #print(freq)
+freq = freq[30:54]
+notes = [random.choice(freq) for i in range(NUM_NOTES)]
 
-    return freq
+
+# Print list of lists i.e. rows
+#print(freq)
+
+#return freq
 
 def calcFreq():
     return 440 * 2**((key - 69) / 12)
-
-#notes = [i for i in np.linspace(FREQ_MIN, FREQ_MAX, NUM_NOTES - 1)] 
-notes = [random.randint(FREQ_MIN, FREQ_MAX) for i in range(NUM_NOTES)]
-random.randint(FREQ_MIN, FREQ_MAX)
-
-twelveTone = readCSV()
-twelveTone = twelveTone[30:54]
-notes = [random.choice(twelveTone) for i in range(NUM_NOTES)]
-
 
 def calcSine(notes, SECONDS):
     #SAMPLE_RATE = 24000
@@ -66,7 +63,7 @@ def playSine(audio):
 
 def callback(in_data, frame_count, time_info, status):
     #data = wf.readframes(frame_count)
-    data = calcSine()
+    data = calcSine(notes, SECONDS)
 
     return (data, pyaudio.paContinue)
 
