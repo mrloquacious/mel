@@ -37,9 +37,9 @@ def calcSine(notes, SECONDS):
         ones = np.ones(NUM_SAMPLES - ATTACK - RELEASE)
         rel_env = np.linspace(1, 0, RELEASE, False)
         att_env = np.append(att_env, ones)
-        att_env = np.append(att_env, rel_env)
+        env = np.append(att_env, rel_env)
 
-        audio = att_env * y * (2**15 - 1) / np.max(np.abs(y))
+        audio = env * y * (2**15 - 1) / np.max(np.abs(y))
         audio = audio.astype(np.int16)
         playSine(audio)
 
