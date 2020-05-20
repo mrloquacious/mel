@@ -12,7 +12,7 @@ import sys
 
 SAMPLE_RATE = 24000
 
-SECONDS = .05
+SECONDS = .25
 FREQ_MIN = 100
 FREQ_MAX = 1000
 NUM_NOTES = 100
@@ -34,14 +34,14 @@ notes = [random.choice(twelveTone) for i in range(NUM_NOTES)]
 
 def calcSine(notes, SECONDS):
     #SAMPLE_RATE = 24000
-    NUM = math.trunc(SECONDS * SAMPLE_RATE)
+    NUM_SAMPLES = math.trunc(SECONDS * SAMPLE_RATE)
 
     for freq in notes:
-        x = np.linspace(0, SECONDS, NUM, False)
+        x = np.linspace(0, SECONDS, NUM_SAMPLES, False)
         y =  np.sin(x * freq * 2 * np.pi)
         # Add the attack envelope:
         att_env = np.linspace(0, 1, ATTACK, False)
-        ones = np.ones(NUM - ATTACK - RELEASE)
+        ones = np.ones(NUM_SAMPLES - ATTACK - RELEASE)
         rel_env = np.linspace(1, 0, RELEASE, False)
         att_env = np.append(att_env, ones)
         att_env = np.append(att_env, rel_env)
