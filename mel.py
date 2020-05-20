@@ -32,12 +32,13 @@ def calcSine(notes, SECONDS):
     for freq in notes:
         x = np.linspace(0, SECONDS, NUM_SAMPLES, False)
         y =  np.sin(x * freq * 2 * np.pi)
+
         # Add the attack envelope:
         att_env = np.linspace(0, 1, ATTACK, False)
         ones = np.ones(NUM_SAMPLES - ATTACK - RELEASE)
         rel_env = np.linspace(1, 0, RELEASE, False)
-        att_env = np.append(att_env, ones)
-        env = np.append(att_env, rel_env)
+        env = np.append(att_env, ones)
+        env = np.append(env, rel_env)
 
         audio = env * y * (2**15 - 1) / np.max(np.abs(y))
         audio = audio.astype(np.int16)
