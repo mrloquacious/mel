@@ -3,11 +3,6 @@ import simpleaudio as sa
 import random
 import pandas as pd
 import math
-import pyaudio
-
-import wave
-import time
-import sys
 
 SAMPLE_RATE = 24000
 
@@ -32,7 +27,6 @@ twelveTone = twelveTone[30:54]
 notes = [random.choice(twelveTone) for i in range(NUM_NOTES)]
 
 def calcSine(notes, SECONDS):
-    #SAMPLE_RATE = 24000
     NUM_SAMPLES = math.trunc(SECONDS * SAMPLE_RATE)
 
     for freq in notes:
@@ -47,9 +41,7 @@ def calcSine(notes, SECONDS):
 
         audio = att_env * y * (2**15 - 1) / np.max(np.abs(y))
         audio = audio.astype(np.int16)
-##### SIMPLEAUDIO PLAY #####
         playSine(audio)
-##### END SIMPLEAUDIO PLAY #####
 
     return 0
 
@@ -60,38 +52,5 @@ def playSine(audio):
     play = sa.play_buffer(audio, 1, 2, 24000)
     play.wait_done();
 
-### TEST ###
 calcSine(notes, SECONDS)
-### END TEST ###
 
-#def callback(in_data, frame_count, time_info, status):
-#    #data = wf.readframes(frame_count)
-#    data = calcSine(notes, SECONDS)
-#
-#    return (data, pyaudio.paContinue)
-#
-#
-###### PYAUDIO #####
-## Create an interface to PortAudio
-#pa = pyaudio.PyAudio()
-#
-## Set up the audio output stream.
-## 'output = True' indicates that the sound will be played rather than recorded
-#stream = pa.open(
-#    format = pa.get_format_from_width(2),
-#    channels = 1,
-#    rate = SAMPLE_RATE,
-#    output = True,
-#    stream_callback = callback)
-#
-#stream.start_stream()
-#
-#while stream.is_active():
-#    time.sleep(0.1)
-#
-## Done, clean up and exit.
-#stream.stop_stream()
-#stream.close()
-#
-## close PyAudio (7)
-##pa.terminate()
