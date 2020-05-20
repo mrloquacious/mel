@@ -26,11 +26,21 @@ twelveTone = [list(row) for row in df.values]
 twelveTone = twelveTone[30:54]
 notes = [random.choice(twelveTone) for i in range(NUM_NOTES)]
 
-def calcSine(notes, SECONDS):
-    NUM_SAMPLES = math.trunc(SECONDS * SAMPLE_RATE)
+#durations = [2**0, 2**-1, 2**-2, 2**-3, 2**-4, 2**-5]
+durations = [2**-1, 2**-2, 2**-3, 2**-4, 2**-5]
+seconds = [random.choice(durations) for i in range(NUM_NOTES)]
+
+def calcSine(notes, seconds):
+    # If using fixed time value for notes:
+    #NUM_SAMPLES = math.trunc(SECONDS * SAMPLE_RATE)
+    #seconds = SECONDS
 
     for freq in notes:
-        x = np.linspace(0, SECONDS, NUM_SAMPLES, False)
+        # .02 to keep us in the + (compensate for attack/release):
+        seconds = min(max(.02, random.random()), .25);
+        NUM_SAMPLES = math.trunc(seconds * SAMPLE_RATE)
+
+        x = np.linspace(0, seconds, NUM_SAMPLES, False)
         y =  np.sin(x * freq * 2 * np.pi)
         # Add the attack envelope:
         att_env = np.linspace(0, 1, ATTACK, False)
