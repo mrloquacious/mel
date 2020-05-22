@@ -19,11 +19,12 @@ RELEASE = int(RELEASE_TIME * SAMPLE_RATE)
 currentNotes = set()
 
 # Create a dataframe from csv
-df = pd.read_csv('freq_12tone.csv', delimiter=',')
+df = pd.read_csv('frequencies_12tone.csv', delimiter=',')
 # User list comprehension to create a list of lists from Dataframe rows
 twelveTone = [list(row) for row in df.values]
 
-twelveTone = twelveTone[42:54]
+twelveTone = twelveTone[48:61]
+
 notes1 = [random.choice(twelveTone) for i in range(NUM_NOTES)]
 notes2 = [random.choice(twelveTone) for j in range(NUM_NOTES)]
 
@@ -62,7 +63,6 @@ def playSine(audio):
     play.wait_done()
 
 for n1, n2 in zip(notes1, notes2):
-    playSine(sumSines(n1, n2, SECONDS))
-    print(n1)
-    print(n2)
+    playSine(sumSines(n1[1], n2[1], SECONDS))
+    print(n1[0] + "-" + n2[0])
 
