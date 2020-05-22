@@ -4,54 +4,56 @@ import random
 import pandas as pd
 import math
 
-SAMPLE_RATE = 24000
+import wavio
 
+MAX_AMPLITUDE = 1
+SAMPLE_RATE = 12000
 SECONDS = .25
-FREQ_MIN = 100
-FREQ_MAX = 1000
-NUM_NOTES = 100
+NUM_NOTES = 20
+NUM_SAMPLES = SAMPLE_RATE * SECONDS
+NOTE_LEN = int(NUM_SAMPLES // NUM_NOTES)
 
-ATTACK_TIME = .01
+ATTACK_TIME = .001
 ATTACK = int(ATTACK_TIME * SAMPLE_RATE)
-RELEASE_TIME = .01
+RELEASE_TIME = .001
 RELEASE = int(RELEASE_TIME * SAMPLE_RATE)
 
-currentNotes = set()
-
 # Create a dataframe from csv
-df = pd.read_csv('freq_12tone.csv', delimiter=',')
+df = pd.read_csv('frequencies_12tone.csv', delimiter=',')
 # User list comprehension to create a list of lists from Dataframe rows
 twelveTone = [list(row) for row in df.values]
 
-twelveTone = twelveTone[30:54]
-notes = [random.choice(twelveTone) for i in range(NUM_NOTES)]
+notes = list()
+notes = [twelveTone[16][1]]
 
-def calcSine(notes, SECONDS):
-    NUM_SAMPLES = math.trunc(SECONDS * SAMPLE_RATE)
-
-    for freq in notes:
-        x = np.linspace(0, SECONDS, NUM_SAMPLES, False)
-        y =  np.sin(x * freq * 2 * np.pi)
-
-        # Add the attack envelope:
-        att_env = np.linspace(0, 1, ATTACK, False)
-        ones = np.ones(NUM_SAMPLES - ATTACK - RELEASE)
-        rel_env = np.linspace(1, 0, RELEASE, False)
-        env = np.append(att_env, ones)
-        env = np.append(env, rel_env)
-
-        audio = env * y * (2**15 - 1) / np.max(np.abs(y))
-        audio = audio.astype(np.int16)
-        playSine(audio)
-
-    return 0
+for i in range(0, NUM_NOTES - 1, 3):
+    notes.append(notes[i] * 2**(1/3))
+    notes.append(notes[i] * 2**(7/12))
+    notes.append(notes[i] * 2)
+        
+def envelope():
+    att_env = np.linspace(0, 1, ATTACK, False)
+    ones = np.ones(NOTE_LEN - ATTACK - RELEASE)
+    rel_env = np.linspace(1, 0, RELEASE, False)
+    env = np.append(att_env, ones)
+    env = np.append(env, rel_env)
+    return env
 
 def playSine(audio):
-    # Example of simpleaudio.play_buffer:
-    # simpleaudio.play_buffer(audio_data, num_channels, bytes_per_sample, sample_rate)
-    
     play = sa.play_buffer(audio, 1, 2, 24000)
     play.wait_done();
+
+def calcSine(notes, SECONDS):
+    x = np.linspace(0, SECONDS / NUM_NOTES, int(NOTE_LEN), False)
+    audio = np.zeros(1)
+    for freq in notes:
+        y =  np.sin(MAX_AMPLITUDE * x * freq * 2 * np.pi)
+        audio2 = (envelope() * y * (2**15 - 1) / np.max(np.abs(y)))
+        #audio2 = audio
+        audio = np.concatenate((audio, audio2))
+        audio = audio.astype(np.int16)
+        playSine(audio)
+        wavio.write("test.wav", audio, SAMPLE_RATE, sampwidth=2, scale="none")
 
 calcSine(notes, SECONDS)
 
