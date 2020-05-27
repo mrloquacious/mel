@@ -10,6 +10,12 @@ import wave
 import time
 import sys
 
+##### NOT FUNCTIONAL #####
+# This was an attempt to adapt Bart's saw synth code (in the fm repo) to 
+# the random melody generator so it would use pyaudio and have an envelope
+# in real time. It's been abandoned, but will leave it here and maybe 
+# return one day.
+
 SAMPLE_RATE = 24000
 
 SECONDS = .25
