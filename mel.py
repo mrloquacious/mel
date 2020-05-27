@@ -4,55 +4,51 @@ import random
 import pandas as pd
 import math
 
+# The original prototype random melody generator.
+# Imports a .csv of note names and frequencies.
+# Chooses a random frequency for NUM_NOTES from a range twelveTone and
+# plays NUM_NOTES random notes, each of a length SECONDS.
+
+# Global parameters:
+SAMPLE_RATE = 24000
+SECONDS = 1
+NUM_NOTES = 100
+
+# Select a set of NUM_NOTES random frequencies (chosen from the range 
+# selected in twelveTone), calculate the sine waves for each, and play 
+# each note:
 def randMel():
+  twelveTone = readCSV()
+  twelveTone = twelveTone[30:54]
+  notes = [random.choice(twelveTone) for i in range(NUM_NOTES)]
+  audio = calcSine(notes)
+  playSine(audio)
 
-    SECONDS = 1
-    FREQ_MIN = 100
-    FREQ_MAX = 1000
-    NUM_NOTES = 100
-    
-    #notes = [i for i in np.linspace(FREQ_MIN, FREQ_MAX, NUM_NOTES - 1)] 
-    #notes = [random.randint(FREQ_MIN, FREQ_MAX) for i in range(NUM_NOTES)]
-    #random.randint(FREQ_MIN, FREQ_MAX)
-    
-    twelveTone = readCSV()
-    twelveTone = twelveTone[30:54]
-    notes = [random.choice(twelveTone) for i in range(NUM_NOTES)]
-    
-    calcSine(notes, SECONDS)
-
+# Read in the list of 108 notes/frequencies (C0-B8):
 def readCSV():
+  df = pd.read_csv('freq_12tone.csv', delimiter=',')
+  freq = [list(row) for row in df.values]
+  return freq
 
-    # Create a dataframe from csv
-    df = pd.read_csv('freq_12tone.csv', delimiter=',')
+# Calculate the sine wave for the frequency of the note passed in:
+def calcSine(notes):
+  # Number of samples for each note:
+  NUM = SECONDS * SAMPLE_RATE
+  x = np.linspace(0, SECONDS, int(NUM), False)
+  audio = np.zeros(0)
 
-    # User list comprehension to create a list of lists from Dataframe rows
-    freq = [list(row) for row in df.values]
+  # Calculate and return a list of generated sine waves
+  for freq in notes:
+    y =  np.sin(x * freq * 2 * np.pi)
+    sine = (y * (2**15 - 1)) / np.max(np.abs(y))
+    audio = np.concatenate((audio, sine))
+  audio = audio.astype(np.int16)
+  return audio
 
-    # Print list of lists i.e. rows
-    #print(freq)
-
-    return freq
-
-
-def calcSine(notes, SECONDS):
-    SAMPLE_RATE = 24000
-    NUM = math.trunc( SECONDS * SAMPLE_RATE)
-
-    for freq in notes:
-        x = np.linspace(0, SECONDS, NUM, False)
-        y =  np.sin(x * freq * 2 * np.pi)
-        audio = y * (2**15 - 1) / np.max(np.abs(y))
-        audio = audio.astype(np.int16)
-        playSine(audio)
-
+# Play the sine wave passed in:
 def playSine(audio):
-    # Example of simpleaudio.play_buffer:
-    # simpleaudio.play_buffer(audio_data, num_channels, bytes_per_sample, sample_rate)
-    
-    play = sa.play_buffer(audio, 1, 2, 24000)
-    play.wait_done();
-
+  play = sa.play_buffer(audio, 1, 2, SAMPLE_RATE)
+  play.wait_done();
 
 randMel()
 
