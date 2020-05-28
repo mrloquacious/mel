@@ -1,7 +1,8 @@
 # Mel  
 
 Started as a random melody generator, but now the master branch plays random
-intervals. Other branches:  
+intervals.  
+Other branches:  
 
 * prototype -- here's the original random melody generator.
 * rhythm -- add rhythm to the melody.
