@@ -49,7 +49,7 @@ def calcSine(freq, SECONDS, NUM_SAMPLES):
 # Add 2 sine waves to form an interval:
 def sumSines(freq1, freq2, SECONDS):
     NUM_SAMPLES = math.trunc(SECONDS * SAMPLE_RATE)
-    y = calcSine(freq1, SECONDS, NUM_SAMPLES) + 
+    y = calcSine(freq1, SECONDS, NUM_SAMPLES) + \
         calcSine(freq2, SECONDS, NUM_SAMPLES)
     audio = envelope(NUM_SAMPLES) * y * (2**15 - 1) / np.max(np.abs(y))
     audio = audio.astype(np.int16)
