@@ -12,7 +12,7 @@ import math
 # also do a similar thing with chords.
 
 # Global constants:
-SAMPLE_RATE = 24000
+SAMPLE_RATE = 8000 # Lowest rate supported by simpleaudio
 SECONDS = 2
 NUM_NOTES = 20
 
@@ -30,11 +30,11 @@ twelveTone = twelveTone[48:61]
 notes1 = [random.choice(twelveTone) for i in range(NUM_NOTES)]
 notes2 = [random.choice(twelveTone) for j in range(NUM_NOTES)]
 
-# An envelope to prevent clicks when changing notes:
-def envelope(NUM_SAMPLES):
-    NUM_SAMPLES = math.trunc(SECONDS * SAMPLE_RATE)
+# An envelope to prevent clicks when changing notes and to smooth endings:
+def envelope():
+    num_samples = SECONDS * SAMPLE_RATE
     att_env = np.linspace(0, 1, ATTACK, False)
-    ones = np.ones(NUM_SAMPLES - ATTACK - RELEASE)
+    ones = np.ones(num_samples - ATTACK - RELEASE)
     rel_env = np.linspace(1, 0, RELEASE, False)
     env = np.append(att_env, ones)
     env = np.append(env, rel_env)
@@ -48,10 +48,10 @@ def calcSine(freq, SECONDS, NUM_SAMPLES):
 
 # Add 2 sine waves to form an interval:
 def sumSines(freq1, freq2, SECONDS):
-    NUM_SAMPLES = math.trunc(SECONDS * SAMPLE_RATE)
-    y = calcSine(freq1, SECONDS, NUM_SAMPLES) + \
-        calcSine(freq2, SECONDS, NUM_SAMPLES)
-    audio = envelope(NUM_SAMPLES) * y * (2**15 - 1) / np.max(np.abs(y))
+    num_samples = SECONDS * SAMPLE_RATE
+    y = calcSine(freq1, SECONDS, num_samples) + \
+        calcSine(freq2, SECONDS, num_samples)
+    audio = envelope() * y * (2**15 - 1) / np.max(np.abs(y))
     audio = audio.astype(np.int16)
     return audio
 
