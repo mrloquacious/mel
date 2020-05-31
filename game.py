@@ -1,9 +1,9 @@
 #Damien Jones, Jesse Emerson
 #©2020 PSU CS410P Music and Sound project
-#Project is written in python3 and can be compiled and ran using the pythinn3 
+#Project is written in python3 and can be compiled and ran using the python3 
 #prefix followed by the file name. ex: 
 #   python3 file_name.py
-# PUSH TEST <----------- REMOVE!!
+
 import time
 import random
 
