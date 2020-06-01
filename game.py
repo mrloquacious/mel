@@ -7,23 +7,35 @@
 import time
 import random
 
-
-
-score = 0
-round = 1
-guesses = 0
-award_points = 5
-
 # Dummy container for saved sounds, to check compilation
 playable = ["snd1.wav", "snd2.wav"] #NOT USED YET<-------------
 # List to add sounds once played.
 played = [] #NOT USED YET<-------------
 
 
+score = 0
+round = 1
+guesses = 0
+award_points = 5
+correct_answer = "amy"
+
+# Getting a random selection from possible_answers to fill multiple choice options
+possible_answers = ["amy","bob","cat","dan","elm","fig","gin","ham","ink","jam"]
+temp_list = possible_answers.copy()
+answers_used = []
+correct_answer = ["amy"]
+choices = []
+COUNT = 1
+
 # Game start
+
 print ("Welcome to CS410P Sound, the game!!\n")
+
+# PLAY THEME MUSIC <-----------
+
 name = input("Please enter your name:\n")
 print("Welcome, " + name, "Lets get started...\n")
+
 # PAUSE 1 sec
 time.sleep(1)
 
@@ -36,6 +48,30 @@ print("Playing interval...")
 time.sleep(0.5)
 
 #Remove interval playable list OR add to a played list.
+
+def increment():
+    global COUNT
+    COUNT += 1
+
+def count_reset():
+    global COUNT
+    COUNT = 1
+
+
+def fill_choices():
+    random_choice = random.choice(possible_answers)
+    while COUNT < 5:
+        if len(choices) == len(possible_answers):
+            break
+        if random_choice in answers_used:
+            fill_choices()
+        else:
+            answers_used.append(random_choice)
+            choices.append(random_choice)
+            #print("Choice " + str(COUNT), " = " + str(choices))
+            increment()
+            break
+
 
 
 # REPLAY INTERVAL loop. Will continue to ask until y,n,q is pressed
@@ -51,9 +87,15 @@ while replay_interval not in ("y","n","q"):
          print("Invalid input, please try again...\n")
 
 # USER CHOICE SELECTION loop.
+
 user_selection = None
+
+for a in range(0,4):
+    fill_choices()
+
 while user_selection not in ("1", "2", "3", "4", "q"):
-        user_selection = input("Enter choice followed by the ENTER key:\n\n 1) ans1\n 2) ans2\n 3) ans3\n 4) ans4\n q) quit\nYour selection: ")
+        print("\n 1) " + str(choices[0]), "\n 2) " + str(choices[1]), "\n 3) " + str(choices[2]), "\n 4) " + str(choices[3]), "\n q) QUIT\n")
+        user_selection = input("Enter choice followed by the ENTER key:\n")
         if user_selection == "1":
             print("selection 1") # CHOICE 1
         elif user_selection == "2":
