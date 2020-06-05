@@ -4,6 +4,8 @@ import random
 import pandas as pd
 import math
 import wavio
+import argparse
+import datetime
 
 """ 
 Effect1 starts with a base frequency (probably a low note) base,
@@ -21,34 +23,70 @@ and a clamp is intended to eliminate clipping, though this is still a
 work in progress.
 """
 
+##### GLOBAL CONSTANTS #####
 MAX_AMPLITUDE = 1
-SAMPLE_RATE = 24000
-seconds = .5 # For a single arpeg
-num_notes = 21 
-note_pattern = [random.randint(0,12), random.randint(0,12), random.randint(0,12)]    #[0,4,7]
-NUM_SAMPLES = SAMPLE_RATE * seconds
-NOTE_LEN = int(NUM_SAMPLES // num_notes)
-
-base = 24
-
-num_arpegs = 4
-arpegs_pattern = list(range(0, num_arpegs)) # Num half steps to move for next arpeg.
-
-#arpegs_pattern = [0,3,7,10] # [0,3,0,7,0]
-#num_arpegs = len(arpegs_pattern)
+SAMPLE_RATE = 48000
 
 ATTACK_TIME = .001
 ATTACK = int(ATTACK_TIME * SAMPLE_RATE)
 RELEASE_TIME = .001
 RELEASE = int(RELEASE_TIME * SAMPLE_RATE)
 
+ap = argparse.ArgumentParser()
+ap.add_argument(
+    "-s", "--seconds",
+    help="Number of seconds (or fraction of a second) for each arpeggio.",
+    type=float,
+    default=.5,
+)
+ap.add_argument(
+    "-b", "--base",
+    help="Index of the base frequency for the first apreggio. Default isindex 12 is C0 = 32.7Hz.",
+    type=int,
+    default=12,
+)
+ap.add_argument(
+    "-nn", "--num_notes",
+    help="Number of notes per arpeggio.",
+    type=int,
+    default=21,
+)
+ap.add_argument(
+    "-np", "--note_pattern",
+    help="List storing the pattern for each arpeggio. This pattern repeats num_notes/len(note_pattern) times.",
+    type=list,
+    default=[0,4,7],
+)
+ap.add_argument(
+    "-na", "--num_arpegs",
+    help="Number of arpeggios generated.",
+    type=int,
+    default=4,
+)
+ap.add_argument(
+    "-ap", "--arpegs_pattern",
+    help="List storing the pattern of where each aarpeggio begins. This pattern repeats num_arpegs) times.",
+    type=list,
+    default=[0,1,2,3],
+)
+args = ap.parse_args()
+
+seconds = args.seconds
+base = args.base
+num_notes = args.num_notes
+note_pattern = args.note_pattern
+num_arpegs = args.num_arpegs
+arpegs_pattern =  args.arpegs_pattern
+#arpegs_pattern = list(map(int, arpegs_pattern))
+ 
+
+num_samples = SAMPLE_RATE * seconds
+note_len = int(num_samples // num_notes)
+
 # Create a dataframe from csv
 df = pd.read_csv('frequencies_12tone.csv', delimiter=',')
 # User list comprehension to create a list of lists from Dataframe rows
 twelveTone = [list(row) for row in df.values]
-
-#def createArpegs(seconds, base_note, num_notes, note_pattern, num_arpeg, arpeg_pattern):
-
 
 # Build a single major arpeggio num_notes long:
 def oneArpeg(seconds, base, num_notes, note_pattern):
@@ -61,25 +99,19 @@ def oneArpeg(seconds, base, num_notes, note_pattern):
   
   return notes
 
-  ### OLD WAY
-  #for i in range(0, num_notes - 1, 3):
-      #notes.append(notes[i] * 2**(1/3))
-      #notes.append(notes[i] * 2**(7/12))
-      #notes.append(notes[i] * 2)
-  #return notes
- 
 # Build num arpeggios, each arpeggio starting a half step up from the prev:
 def manyArpeg(seconds, base, num_notes, note_pattern, num_arpegs, arpegs_pattern):
   notes = list()
   for i in range(0, num_arpegs):
       print(arpegs_pattern[i])
-      notes.append(oneArpeg(seconds, base + arpegs_pattern[i], num_notes, note_pattern))
+      arpegs_pattern = 1 # arpegs_pattern[i]
+      notes.append(oneArpeg(seconds, base + int(arpegs_pattern), num_notes, note_pattern))
   return notes
      
 # Envelope to eliminate clicks that occur when changing notes:
 def envelope():
   att_env = np.linspace(0, 1, ATTACK, False)
-  ones = np.ones(NOTE_LEN - ATTACK - RELEASE)
+  ones = np.ones(note_len - ATTACK - RELEASE)
   rel_env = np.linspace(1, 0, RELEASE, False)
   env = np.append(att_env, ones)
   env = np.append(env, rel_env)
@@ -96,7 +128,7 @@ def clamp(n):
 
 # Calculate and return a list of lists (ascending arpeggios):
 def calcSine(notes):
-  x = np.linspace(0, seconds / num_notes, int(NOTE_LEN), False)
+  x = np.linspace(0, seconds / num_notes, int(note_len), False)
   audioAll = np.zeros(0)
   for arpeg in notes:
       for freq in arpeg:
@@ -117,7 +149,10 @@ def main():
   notes = manyArpeg(seconds, base, num_notes, note_pattern, num_arpegs, arpegs_pattern)
   audioAll = calcSine(notes)
   playAudio(audioAll)
-  wavio.write("test.wav", audioAll, SAMPLE_RATE, sampwidth=2, scale="none")
+  #wavio.write(str(datetime.datetime.now().time()) + ".wav", audioAll, SAMPLE_RATE, sampwidth=2, scale="none")
+  wavio.write(str(seconds) + '_' + str(base) + '_' + str(num_notes) + '_' + str(note_pattern) + '_' 
+      + str(num_arpegs) + '_' + str(arpegs_pattern) + '_' + ".wav", audioAll, SAMPLE_RATE, sampwidth=2, 
+      scale="none")
 
 
 if __name__ == "__main__":
